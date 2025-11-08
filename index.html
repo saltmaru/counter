@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カウンターアプリ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 40px;
+            background-color: #f9fafb;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        #counters>div {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
+        }
+
+
+        button {
+            margin-left: 5px;
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:nth-of-type(1) {
+            background-color: #e0e0e0;
+        }
+
+        /* － */
+        button:nth-of-type(2) {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        /* ＋ */
+        button:nth-of-type(3) {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* 削除 */
+
+        label {
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #add {
+            padding: 8px 14px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        #add:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="counters"></div>
+
+    <label for="text">追加するテキスト</label>
+    <input type="text" id="text">
+    <button id="add">追加</button>
+
+    <script>
+        let data;
+
+        const counters = document.getElementById('counters');
+        const button = document.getElementById('add');
+        const input = document.getElementById('text');
+
+
+        function getData() {
+            data = JSON.parse(localStorage.getItem("data")) ?? {};
+            for (const key in data) {
+                createCounter(key, data[key]);
+            }
+        }
+
+        getData();
+
+        function setData(value) {
+            localStorage.setItem("data", JSON.stringify(value));
+        }
+
+
+        function createCounter(value, count = 0) {
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '8px';
+
+            const label = document.createElement('span');
+            label.textContent = value + ' ';
+
+            const countText = document.createElement('span');
+            countText.textContent = count;
+
+            const incrementButton = document.createElement('button');
+            incrementButton.textContent = "＋";
+            const decrementButton = document.createElement('button');
+            decrementButton.textContent = "－";
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "削除";
+
+            data[value] = count;
+            setData(data);
+
+            incrementButton.addEventListener('click', () => {
+                data[value]++;
+                countText.textContent = data[value];
+                setData(data);
+            });
+
+            decrementButton.addEventListener('click', () => {
+                data[value]--;
+                countText.textContent = data[value];
+                setData(data);
+            });
+
+            deleteButton.addEventListener('click', () => {
+                counters.removeChild(wrapper);
+                delete data[value];
+                setData(data);
+            });
+
+            wrapper.append(label, countText, decrementButton, incrementButton, deleteButton);
+            counters.appendChild(wrapper);
+        }
+
+        button.addEventListener('click', () => {
+            const value = input.value.trim();
+            if (value === "" || value in data) return;
+            createCounter(value);
+            input.value = "";
+        });
+    </script>
+</body>
+
+</html>
